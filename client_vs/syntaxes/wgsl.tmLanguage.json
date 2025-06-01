@@ -1,0 +1,228 @@
+{
+	"scopeName": "source.wgsl",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#constants"
+		},
+		{
+			"include": "#functions"
+		},
+		{
+			"include": "#types"
+		},
+		{
+			"include": "#storage"
+		},
+		{
+			"include": "#function_call"
+		},
+		{
+			"include": "#attributes"
+		},
+		{
+			"include": "#builtins"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#variables"
+		}
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.double-slash.wgsl",
+					"match": "\\s*//.*"
+				},
+				{
+					"name": "comment.block.wgsl",
+					"begin": "/\\*",
+					"end": "\\*/"
+				}
+			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"name": "constant.language.bool.wgsl",
+					"match": "\\b(true|false)\\b"
+				},
+				{
+					"name": "constant.numeric.float.wgsl",
+					"match": "\\b(0[fh])|([1-9][0-9]*[fh])|([0-9]*\\.[0-9]+([eE][+-]?[0-9]+)?[fh]?)|([0-9]+\\.[0-9]*([eE][+-]?[0-9]+)?[fh]?)|[0-9]+[eE][+-]?[0-9]+[fh]?|0[xX][0-9a-fA-F]*\\.[0-9a-fA-F]+([pP][+-]?[0-9]+[fh]?)?|0[xX][0-9a-fA-F]+\\.[0-9a-fA-F]*([pP][+-]?[0-9]+[fh]?)?|0[xX][0-9a-fA-F]+[pP][+-]?[0-9]+[fh]?\\b"
+				},
+				{
+					"name": "constant.numeric.integer.wgsl",
+					"match": "\\b(0[iu]?|[1-9][0-9]*[iu]?|0[xX][0-9a-fA-F]+[iu]?)\\b"
+				}
+			]
+		},
+		"types": {
+			"patterns": [
+				{
+					"name": "storage.type.wgsl",
+					"match": "\\b(bool|AbstractInt|AbstractFloat|i32|u32|f32|f16)\\b|\\b(vec[2-4]<)(i32|u32|f32|f16)(>)\\b"
+				},
+				{
+					"name": "entity.type.wgsl",
+					"match": "\\b(vec2i|vec3i|vec4i|vec2u|vec3u|vec4u|vec2f|vec3f|vec4f|vec2h|vec3h|vec4h)\\b"
+				}
+			]
+		},
+		"storage": {
+			"patterns": [
+				{
+					"name": "storage.modifier.wgsl keyword.other.wgsl",
+					"match": "\\b(const|var|let)\\b"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"name": "meta.function.definition.wgsl",
+					"begin": "\\b(fn)\\s+([a-z_]\\w*)\\s*(\\()",
+					"end": "{",
+					"beginCaptures": {
+						"2": {
+							"name": "entity.name.function.wgsl"
+						},
+						"3": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					},
+					"patterns": [
+						{
+							"name": "keyword.operator.arrow.skinny.wgsl",
+							"match": "\\s->\\s"
+						},
+						{
+							"include": "#attributes"
+						}
+					]
+				},
+				{
+					"name": "meta.function.definition.wgsl",
+					"begin": "\\b(fn)\\s+([a-z_]\\w*)(<)",
+					"end": "{",
+					"beginCaptures": {
+						"2": {
+							"name": "entity.name.function.wgsl"
+						},
+						"3": {
+							"name": "punctuation.brackets.angle.wgsl"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					},
+					"patterns": [
+						{
+							"name": "keyword.operator.arrow.skinny.wgsl",
+							"match": "\\s->\\s"
+						},
+						{
+							"include": "#attributes"
+						}
+					]
+				}
+			]
+		},
+		"function_call": {
+			"patterns": [
+				{
+					"name": "meta.function.call.wgsl",
+					"begin": "\\b([a-z_]\\w*)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.function.wgsl"
+						},
+						"2": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#constants"
+						}
+					]
+				}
+			]
+		},
+		"operators": {
+			"patterns": [
+				{
+					"name": "keyword.operator.arrow.skinny.wgsl",
+					"match": "\\s->\\s"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.other.wgsl",
+					"match": "\\b(alias|const_assert|continuing|default|diagnostic|discard|enable|fn|override|requires|struct)\\b"
+				},
+				{
+					"name": "keyword.control.wgsl",
+					"match": "\\b(if|else|loop|for|while|continue|break|return|switch|case)\\b"
+				}
+			]
+		},
+		"variables": {
+			"patterns": [
+				{
+					"name": "variable.other.wgsl",
+					"match": "\\b(?<!(?<!\\.)\\.)(?:r#(?!(crate|[Ss]elf|super)))?[a-z0-9_]+\\b"
+				}
+			]
+		},
+		"attributes": {
+			"patterns": [
+				{
+					"name": "meta.attribute.wgsl",
+					"begin": "(@)(align|binding|builtin|diagnostic|group|id|interpolate|location|blend_src|size|workgroup_size)(\\()",
+					"end": "\\)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.at.wgsl support.function.builtin.wgsl"
+						},
+						"2": {
+							"name": "support.function.builtin.wgsl"
+						},
+						"3": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					},
+					"endCaptures": {
+						"3": {
+							"name": "punctuation.brackets.round.wgsl"
+						}
+					}
+				},
+				{
+					"name": "entity.other.attribute-name.wgsl support.variable.wgsl",
+					"match": "@(const|invariant|must_use|compute|fragment|vertex)\\b"
+				}
+			]
+		}
+	}
+}
