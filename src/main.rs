@@ -4,6 +4,11 @@ use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer, LspService, Server};
 
+use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
+
 #[derive(Debug)]
 struct Backend {
     client: Client,
@@ -28,7 +33,7 @@ impl LanguageServer for Backend {
                 )),
                 completion_provider: Some(CompletionOptions {
                     resolve_provider: Some(false),
-                    trigger_characters: Some(vec![".".to_string(), "h".to_string()]),
+                    trigger_characters: Some(vec![".".to_string()]),
                     work_done_progress_options: Default::default(),
                     all_commit_characters: None,
                     completion_item: None,
@@ -66,15 +71,60 @@ impl LanguageServer for Backend {
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
-        self.client
-            .log_message(
-                MessageType::INFO,
-                format!("File changed: {}", params.text_document.uri),
-            )
-            .await;
+        // self.client
+        //     .log_message(MessageType::INFO, format!("File changed: {:#?}", params))
+        //     .await;
+        let module = match naga::front::wgsl::parse_str(
+            &params
+                .content_changes
+                .first()
+                .expect("content changes was empty")
+                .text,
+        ) {
+            Ok(module) => module,
+            Err(parse_err) => {
+                self.client
+                    .log_message(
+                        MessageType::ERROR,
+                        parse_err.emit_to_string(
+                            &params
+                                .content_changes
+                                .first()
+                                .expect("content changes was empty")
+                                .text,
+                        ),
+                    )
+                    .await;
+                return;
+            }
+        };
+
+        let mut validator = naga::valid::Validator::new(
+            naga::valid::ValidationFlags::all(),
+            naga::valid::Capabilities::default(),
+        );
+
+        match validator.validate(&module) {
+            Ok(module_info) => {
+                self.client
+                    .log_message(
+                        MessageType::INFO,
+                        format!("File changed: {:#?}", module_info),
+                    )
+                    .await;
+            }
+            Err(err) => {
+                self.client
+                    .log_message(MessageType::INFO, format!("File changed: {:#?}", err))
+                    .await;
+            }
+        }
     }
 
-    async fn completion(&self, _: CompletionParams) -> Result<Option<CompletionResponse>> {
+    async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
+        self.client
+            .log_message(MessageType::INFO, format!("params: {:#?}", params))
+            .await;
         Ok(Some(CompletionResponse::Array(vec![
             CompletionItem::new_simple("hello".to_string(), "Hello completion".to_string()),
             CompletionItem::new_simple("world".to_string(), "World completion".to_string()),

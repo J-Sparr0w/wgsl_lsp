@@ -6,10 +6,13 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.98"
 chumsky = "0.10.1"
+compact_str = "0.9.0"
 dashmap = "6.1.0"
 env_logger = "0.11.8"
 im-rc = "15.1.0"
 log = "0.4.27"
+mimalloc = "0.1.46"
+naga = {version = "25.0.1", features = ["wgsl-in"]}
 oxc_index = "3.0.0"
 ropey = "1.6.1"
 rust-lapper = "1.1.0"
